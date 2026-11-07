@@ -1,0 +1,4 @@
+features,pr_auc,threshold,alerts,alerts_per_day,fraud_caught,fraud_total,recall,precision,innocent_flagged,share_of_stolen_money_stopped,total_cost,cost_if_no_model
+strict,1.0,0.0003,2912,292,2591,2592,1.0,0.89,321,1.0,3311045,3929345090
+realistic,0.998,0.991,2567,258,2567,2592,0.99,1.0,0,0.964,142966045,3929345090
+leaky,0.999,0.271,2567,258,2566,2592,0.99,1.0,1,1.0,3136394,3929345090

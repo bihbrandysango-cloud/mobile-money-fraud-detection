@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fraud Alarm Check</title>
+<style>
+  :root { --bg:#ffffff; --text:#111827; --muted:#6b7280; --card:#f9fafb; --line:#e5e7eb;
+          --green:#16a34a; --green-bg:#f0fdf4; --red:#dc2626; --red-bg:#fef2f2; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#111827; --text:#f9fafb; --muted:#9ca3af; --card:#1f2937; --line:#374151;
+            --green-bg:#052e16; --red-bg:#450a0a; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:18px/1.5 system-ui, sans-serif; }
+  main { max-width:720px; margin:0 auto; padding:24px 16px 48px; }
+  h1 { font-size:1.6rem; margin:0 0 8px; }
+  p.lead { color:var(--muted); margin:0 0 24px; }
+  .stories { display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); margin-bottom:24px; }
+  .stories button { text-align:left; padding:14px; border:1px solid var(--line); border-radius:12px;
+                    background:var(--card); color:var(--text); font:inherit; cursor:pointer; }
+  .stories button b { display:block; margin-bottom:4px; }
+  .stories button span { font-size:.85rem; color:var(--muted); }
+  form { display:grid; gap:14px; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:16px; }
+  label { display:grid; gap:4px; font-weight:600; }
+  input, select { font:inherit; padding:10px; border:1px solid var(--line); border-radius:8px;
+                  background:var(--bg); color:var(--text); width:100%; }
+  .row { display:grid; gap:14px; grid-template-columns:1fr 1fr; }
+  @media (max-width:520px) { .row { grid-template-columns:1fr; } }
+  button.go { padding:14px; border:0; border-radius:10px; background:var(--text); color:var(--bg);
+              font:inherit; font-weight:700; cursor:pointer; }
+  #result { margin-top:20px; border-radius:12px; padding:18px; display:none; }
+  #result.stop { display:block; background:var(--red-bg); border:2px solid var(--red); }
+  #result.allow { display:block; background:var(--green-bg); border:2px solid var(--green); }
+  #result h2 { margin:0 0 6px; font-size:1.4rem; }
+  .note { color:var(--muted); font-size:.85rem; margin-top:20px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>🛡️ Is this mobile money transaction safe?</h1>
+  <p class="lead">Thieves who get into a mobile money account usually send the money to a new account and
+    cash it out fast. Answer five questions and the tool tells you whether to let it through or stop it.
+    Everything runs on your device; nothing is sent anywhere.</p>
+
+  <div class="stories" id="stories"></div>
+
+  <form id="f">
+    <label>What is happening?
+      <select name="kind"><option value="withdraw">Withdraw cash at an agent</option>
+        <option value="send">Send money to another account</option></select></label>
+    <div class="row">
+      <label>How much? (FCFA)<input name="amount" type="number" min="100" step="500" required></label>
+      <label>Money in the account before (FCFA)<input name="balance" type="number" min="0" step="500" required></label>
+    </div>
+    <label>What time is it? (0–23)<input name="hour" type="number" min="0" max="23" required></label>
+    <div class="row">
+      <label>Is the receiving account new and empty?
+        <select name="receiverIsNew"><option value="false">No</option><option value="true">Yes</option></select></label>
+      <label>Was the same amount just moved the other way?
+        <select name="sameAmountMoved"><option value="false">No</option><option value="true">Yes</option></select></label>
+    </div>
+    <button class="go" type="submit">Check this transaction</button>
+  </form>
+
+  <section id="result" aria-live="polite"></section>
+
+  <p class="note">Demo only. The tool learned from simulated transactions (PaySim), not real MTN or Orange
+    customers. Amounts are shown in FCFA to make them easy to read. Built by Bih Brandy Sango.</p>
+</main>
+<script src="fraud-alarm.js"></script>
+<script>
+  var STORIES = [
+    { title: "🙂 A normal withdrawal", text: "Marie withdraws 25,000 FCFA at her usual agent in the afternoon.",
+      q: { kind: "withdraw", amount: 25000, balance: 180000, hour: 14, receiverIsNew: false, sameAmountMoved: false } },
+    { title: "🚨 An obvious theft", text: "At 2 a.m., someone empties Marie's account into a brand-new account.",
+      q: { kind: "send", amount: 450000, balance: 450000, hour: 2, receiverIsNew: true, sameAmountMoved: true } },
+    { title: "🕵️ A clever theft", text: "Late at night, a thief takes most (not all) of the money.",
+      q: { kind: "send", amount: 300000, balance: 420000, hour: 23, receiverIsNew: true, sameAmountMoved: false } }
+  ];
+  var form = document.getElementById("f"), out = document.getElementById("result");
+
+  function fill(q) { for (var k in q) form.elements[k].value = String(q[k]); }
+  function read() {
+    return { kind: form.elements.kind.value, amount: Number(form.elements.amount.value),
+             balance: Number(form.elements.balance.value), hour: Number(form.elements.hour.value),
+             receiverIsNew: form.elements.receiverIsNew.value === "true",
+             sameAmountMoved: form.elements.sameAmountMoved.value === "true" };
+  }
+  function show(r) {
+    out.className = r.verdict;
+    out.innerHTML = "<h2>" + (r.verdict === "stop" ? "🔴 " : "🟢 ") + r.headline + "</h2>" +
+      "<p>The tool is <b>" + r.confidence + "</b> " + (r.verdict === "stop" ? "this could be a theft." : "this is safe.") +
+      "</p><b>Why:</b><ul>" + r.reasons.map(function (x) { return "<li>" + x + "</li>"; }).join("") + "</ul>";
+  }
+  function run() {
+    try { show(FraudAlarm.check(read())); }
+    catch (e) { out.className = "stop"; out.innerHTML = "<p>" + e.message + "</p>"; }
+  }
+
+  var box = document.getElementById("stories");
+  STORIES.forEach(function (s) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.innerHTML = "<b>" + s.title + "</b><span>" + s.text + "</span>";
+    b.onclick = function () { fill(s.q); run(); };
+    box.appendChild(b);
+  });
+  form.onsubmit = function (e) { e.preventDefault(); run(); };
+  fill(STORIES[0].q);
+</script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+model,test,pr_auc,reviews,fraud_caught,fraud_total,recall,money_stopped,innocent_reviewed
+old (strict),as_simulated,0.999,2987,2591,2592,1.0,1.0,396
+new (robust),as_simulated,1.0,2987,2591,2592,1.0,1.0,396
+old (strict),partial,0.242,2987,762,2592,0.294,0.897,2225
+new (robust),partial,0.995,2987,2592,2592,1.0,1.0,395
+old (strict),partial_split,0.253,2987,751,2592,0.29,0.861,2236
+new (robust),partial_split,0.925,2987,2285,2592,0.882,0.99,702
+old (strict),partial_split_funded_mule,0.253,2987,751,2592,0.29,0.861,2236
+new (robust),partial_split_funded_mule,0.746,2987,1791,2592,0.691,0.959,1196

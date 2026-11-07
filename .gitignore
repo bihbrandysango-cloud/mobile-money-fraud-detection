@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+data/raw/
+data/*.parquet
+reports/test_scores_*.parquet
+reports/model_strict.txt
+reports/model_realistic.txt
+reports/model_leaky.txt
+reports/*.log
