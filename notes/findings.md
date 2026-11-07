@@ -70,3 +70,23 @@ What the new alarm relies on most: share of balance sent (24%), money-chain matc
 - The receiver's balance helps mainly because PaySim mules start at zero (99.9% of fraud transfers). When that habit is removed, recall drops from 88% to 69%.
 - Everything is still simulated data. These numbers show how to build and test an alarm, not how well it would work at MTN.
 - Another simulator quirk: about half of honest senders show a zero balance before sending (46-54%), while fraud senders almost never do (under 1%). The alarm uses this through "share of balance sent", which is coded -1 when the balance is zero. See `reports/shap_summary.png`.
+
+## 6. Four alarms, five runs, and money (`src/compare.py`, 7 Nov 2026)
+
+Section 5 used one random run. This repeats everything with seeds 0-4 (model start, practice copies and test changes all vary) and adds two simple comparisons: a one-line rule (flag when the amount is exactly the sender's balance, biggest first) and a logistic regression on the strict clues. Budget: 300 reviews a day (2,987 in the test days).
+
+Share of thefts caught, average (lowest-highest run):
+
+| Test | One-line rule | Simple model | Old alarm | New alarm |
+|---|---|---|---|---|
+| As simulated | 99.6% | 70.8% | 99.9% | 100% |
+| Take 60-95%, chain kept | 20.0% | 9.2% | 23.7% (18-30%) | 100% |
+| Take 60-95%, chain broken | 20.0% | 9.2% | 25.3% (19-33%) | 87.4% (87-88%) |
+| Same + funded mule | 20.0% | 9.2% | 25.3% (19-33%) | 73.1% (65-81%) |
+
+Share of stolen money stopped in the hardest test: rule 79.4%, simple model 60.4%, old 76.8%, new 96.5% (about 3.50 bn of 3.63 bn units, against 3 m for the calls at 1,000 per review).
+
+Notes:
+- The first version of the rule used "amount at least the balance" and caught only 28%, because honest cash-outs in PaySim often go over the recorded balance. The exact-match rule is the right test of the giveaway.
+- When the rule's habit disappears, it falls back to reviewing the biggest transfers, which is where its 20% comes from.
+- The single run in section 5 (69% on the hardest test) sits inside the 65-81% range. The website's "about 7 in 10" still holds.

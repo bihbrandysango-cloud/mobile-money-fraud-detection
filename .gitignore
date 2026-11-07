@@ -8,3 +8,4 @@ reports/model_strict.txt
 reports/model_realistic.txt
 reports/model_leaky.txt
 reports/*.log
+reports/pr_scores_seed0.parquet
