@@ -1,5 +1,7 @@
 # Mobile money fraud alarm: what "99% accuracy" hides
 
+[![tests](https://github.com/bihbrandysango-cloud/mobile-money-fraud-detection/actions/workflows/tests.yml/badge.svg)](https://github.com/bihbrandysango-cloud/mobile-money-fraud-detection/actions/workflows/tests.yml)
+
 **Live demo:** https://pixel-perfect-page-615.lovable.app (it runs in your browser; the alarm file is hosted on the Hugging Face Space [BrandyBih/mobile-money-fraud-alarm](https://huggingface.co/spaces/BrandyBih/mobile-money-fraud-alarm))
 
 In 2024 Cameroon handled 65% of all mobile money transactions in the CEMAC zone (BEAC). When a thief gets into a wallet, through a fake MTN or Orange call, a "wrong transfer" SMS or a SIM swap, the money usually leaves the same way: a transfer to a middleman account (a mule), then a cash-out at an agent. An operator has to catch that while it happens, without calling thousands of honest customers.
@@ -59,25 +61,22 @@ PaySim (Lopez-Rojas, Elmir and Axelsson, 2016) is a simulation of one month of a
 | 5 | `src/compare.py`, `src/charts.py` | Four alarms over five seeds, money, charts |
 | 6 | `src/explain.py` | SHAP summary chart |
 | 7 | `src/scoring.py`, `src/api.py`, `src/app.py` | Scoring with reasons, FastAPI, Streamlit page |
-| 8 | `src/export_js.py`, `tests/parity.py` | Browser version of the alarm, checked against Python (2,000 of 2,000 answers identical) |
+| 8 | `src/export_js.py`, `tests/test_alarm.py` | Browser version of the alarm, checked against Python (2,000 of 2,000 answers identical) |
+| - | `src/download_data.py`, `run_all.py` | Data download (resumes if cut off) and the whole pipeline in one command |
 
 Notes: [notes/findings.md](notes/findings.md) (all results and quirks), [notes/project_plan.md](notes/project_plan.md).
 
 ## Run it
 
-Download the PaySim CSV from Kaggle (`ealaxi/paysim1`, CC BY-SA 4.0) into `data/raw/`, then:
-
 ```
 python -m venv .venv
 .venv/Scripts/pip install -r requirements.txt
-.venv/Scripts/python src/prepare.py
-.venv/Scripts/python src/flawed_replication.py
-.venv/Scripts/python src/baseline.py
-.venv/Scripts/python src/robust.py
-.venv/Scripts/python src/compare.py
-.venv/Scripts/python src/charts.py
-.venv/Scripts/python src/explain.py
+.venv/Scripts/python run_all.py            # download, every step, tests (about 40-60 minutes)
+.venv/Scripts/python run_all.py --list     # the steps
+.venv/Scripts/python run_all.py --from robust
 ```
+
+The download needs no Kaggle account (PaySim, `ealaxi/paysim1`, CC BY-SA 4.0). On every push, GitHub runs the tests in `tests/` without the data: the three website stories, the browser file matching the model, and the browser alarm matching Python on 3,000 generated transactions and 2,000 questions.
 
 The trained model is in `reports/`, so the app runs without the raw data:
 

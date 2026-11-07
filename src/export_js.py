@@ -41,7 +41,8 @@ def flatten(tree):
             "leaf": leaves, "lc": leaf_cover, "root": root}
 
 
-def main():
+def build():
+    """Return the JavaScript text for the current model."""
     booster = lgb.Booster(model_file=str(REPORTS / "model_robust.txt"))
     dump = booster.dump_model()
     assert dump["objective"].startswith("binary sigmoid:1")
@@ -52,9 +53,14 @@ def main():
         "typicalReceiver": json.loads((REPORTS / "receiver_profiles.json").read_text())["established_receiver"],
     }
     js = (ENGINE.replace("__MODEL__", json.dumps(model, separators=(",", ":"))))
+    return js
+
+
+def main():
+    js = build()
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(js, encoding="utf-8")
-    print(f"{OUT} ({OUT.stat().st_size / 1024:.0f} KB, {len(model['trees'])} trees)")
+    OUT.write_bytes(js.encode("utf-8"))
+    print(f"{OUT} ({OUT.stat().st_size / 1024:.0f} KB)")
 
 
 ENGINE = r"""/*! Mobile money fraud alarm (demo). Trained on PaySim, simulated data,
