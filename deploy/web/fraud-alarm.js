@@ -175,9 +175,10 @@
 
     return {
       verdict: alert ? "stop" : "allow",
-      headline: alert ? "Stop and call the customer" : "Looks normal, let it through",
+      headline: alert ? "Check with the customer before the money moves" : "Looks normal, let it through",
       confidence: p.risk >= 0.5 || p.risk < M.threshold / 10 ? "very sure" : "fairly sure",
-      reasons: keys.slice(0, 3).map(function (k) { return plain(k, x, q.kind); }),
+      reasons: keys.slice(0, 3).map(function (k) { return plain(k, x, q.kind); })
+        .concat(alert ? ["About 4 in 10 alerts like this turn out to be honest customers, so check before acting"] : []),
       risk: p.risk
     };
   }

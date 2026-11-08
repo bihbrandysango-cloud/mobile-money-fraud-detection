@@ -41,7 +41,7 @@ require("fs").writeFileSync(process.argv[4], JSON.stringify({rows, qs}));
 def test_website_stories(story, verdict):
     result = check(*story)
     assert result["verdict"] == verdict
-    assert len(result["reasons"]) == 3
+    assert len(result["reasons"]) == (4 if verdict == "stop" else 3)
 
 
 def test_bad_question_refused():

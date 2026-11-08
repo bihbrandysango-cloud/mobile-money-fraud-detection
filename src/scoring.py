@@ -147,6 +147,10 @@ def _plain(feature, x, kind):
     return feature
 
 
+# In the hardest test (src/robust.py), 1,196 of 2,987 reviewed alerts were honest customers.
+FALSE_ALARM_NOTE = "About 4 in 10 alerts like this turn out to be honest customers, so check before acting"
+
+
 def check(kind, amount, balance, hour, receiver_is_new, same_amount_moved):
     """Everyday questions in, plain answer out.
 
@@ -186,9 +190,9 @@ def check(kind, amount, balance, hour, receiver_is_new, same_amount_moved):
     top = side.abs().sort_values(ascending=False).index[:3]
     return {
         "verdict": "stop" if alert else "allow",
-        "headline": "Stop and call the customer" if alert else "Looks normal, let it through",
+        "headline": "Check with the customer before the money moves" if alert else "Looks normal, let it through",
         "confidence": ("very sure" if risk >= 0.5 or risk < THRESHOLD / 10 else "fairly sure"),
-        "reasons": [_plain(f, x, kind) for f in top],
+        "reasons": [_plain(f, x, kind) for f in top] + ([FALSE_ALARM_NOTE] if alert else []),
     }
 
 
