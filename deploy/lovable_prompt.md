@@ -64,7 +64,7 @@ window.FraudAlarm.check({kind: "send", amount: 300000, balance: 420000, hour: 23
 ```
 - It returns:
 ```json
-{"verdict": "stop", "headline": "Check with the customer before the money moves", "confidence": "very sure",
+{"verdict": "stop", "headline": "Check with the customer before the money moves", "confidence": "fairly confident",
  "reasons": ["It takes 71% of the money in the account", "The money goes to a new, empty account", "The account had 420,000 FCFA before"],
  "risk": 0.82}
 ```

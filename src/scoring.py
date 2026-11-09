@@ -191,7 +191,7 @@ def check(kind, amount, balance, hour, receiver_is_new, same_amount_moved):
     return {
         "verdict": "stop" if alert else "allow",
         "headline": "Check with the customer before the money moves" if alert else "Looks normal, let it through",
-        "confidence": ("very sure" if risk >= 0.5 or risk < THRESHOLD / 10 else "fairly sure"),
+        "confidence": ("fairly confident" if risk >= 0.5 or risk < THRESHOLD / 10 else "not fully certain"),
         "reasons": [_plain(f, x, kind) for f in top] + ([FALSE_ALARM_NOTE] if alert else []),
     }
 
