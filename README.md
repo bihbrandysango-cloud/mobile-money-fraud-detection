@@ -46,6 +46,31 @@ Balances recorded after the transaction are left out. They contain simulator qui
 
 Each alert comes with its reasons, worked out with SHAP (how much each clue pushed the score up or down), for example "It takes 71% of the money in the account" and "The money goes to a new, empty account".
 
+## False alarms, and how far to trust a score
+
+My mentor asked how the project communicates false positives and avoids giving users too much confidence, especially on simulated data. Here is what the deployed alarm does with 300 reviews a day over the ten test days (2,987 reviews):
+
+| | Thieves as simulated | Smarter thieves (hardest test) |
+|---|---|---|
+| Honest customers among the alerts | 396 (13%) | 1,209 (40%) |
+| Honest customers called per day | about 40 | about 121 |
+| Thefts caught | 2,591 of 2,592 | 1,778 of 2,592 |
+
+Who gets wrongly flagged: mostly cash-outs (77% as simulated, 91% in the hardest test), about a third paying into an account that has never received money, and about 1 in 10 sending 90% or more of their balance. Their median amount (122,000 to 145,000 units) is close to a typical honest transaction (165,000), so a false alarm can land on an ordinary customer. For them it means a held payment and a phone call, and at an agent it can mean leaving without their cash.
+
+![Calibration: risk score against the share that really were thefts](reports/chart_calibration.png)
+
+The risk score ranks transactions well, but it is not a probability:
+
+- With thieves as simulated, the middle scores are too high: transactions scored 50-80% were thefts only 2.5% of the time.
+- With smarter thieves it is the other way round: transactions scored 5-20% were thefts 64% of the time, and about 720 of the 814 missed thefts scored below 1%. A low score does not mean safe.
+
+What the project does about it:
+
+- The demo never shows the raw percentage. Alerts say "Check with the customer before the money moves", the alarm is "fairly confident" rather than "very sure", and every alert adds "About 4 in 10 alerts like this turn out to be honest customers" (the hardest-test rate).
+- The alert line is set by how many reviews a team can make a day, not by trusting the score.
+- The scores were learned from PaySim, whose habits real MTN or Orange traffic may not share (thieves empty the account, mule accounts start at zero, about half of honest senders show a zero balance). Before an operator showed the score as a probability, it would need recalibrating on the operator's own confirmed cases. That step is not part of this project.
+
 ## What the data can't tell you
 
 PaySim (Lopez-Rojas, Elmir and Axelsson, 2016) is a simulation of one month of a mobile money service in an African country, built from a real operator's logs. It is not MTN or Orange data. Some of its habits are artefacts of the simulator: thieves always empty the account, mule accounts start at zero, about half of honest senders show a zero balance, and honest traffic drops sharply in the last ten days while thefts stay at about 1,850 a week. These numbers show how to build and test an alarm properly. They do not say how well it would work inside a real operator.
@@ -59,7 +84,7 @@ PaySim (Lopez-Rojas, Elmir and Axelsson, 2016) is a simulation of one month of a
 | 3 | `src/baseline.py` | Time split (train days 1-18, tune 19-21, test 22-31), cost-based threshold |
 | 4 | `src/robust.py` | The new alarm and the four tests |
 | 5 | `src/compare.py`, `src/charts.py` | Four alarms over five seeds, money, charts |
-| 6 | `src/explain.py` | SHAP summary chart |
+| 6 | `src/explain.py`, `src/false_alarms.py` | SHAP summary chart; who gets wrongly flagged and the calibration chart |
 | 7 | `src/scoring.py`, `src/api.py`, `src/app.py` | Scoring with reasons, FastAPI, Streamlit page |
 | 8 | `src/export_js.py`, `tests/test_alarm.py` | Browser version of the alarm, checked against Python (2,000 of 2,000 answers identical) |
 | - | `src/download_data.py`, `run_all.py` | Data download (resumes if cut off) and the whole pipeline in one command |

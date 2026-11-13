@@ -24,6 +24,7 @@ STEPS = [
     ("compare", "src/compare.py", "Four alarms over five seeds, money"),
     ("charts", "src/charts.py", "README charts"),
     ("explain", "src/explain.py", "SHAP summary chart"),
+    ("false_alarms", "src/false_alarms.py", "Who is wrongly flagged, calibration chart"),
     ("export", "src/export_js.py", "Browser version of the alarm"),
     ("test", "-m pytest -q tests", "Stories, browser parity, export up to date"),
 ]

@@ -1,0 +1,3 @@
+test,reviews,thefts_caught,honest_flagged,honest_share,honest_flagged_per_day,fp_transfers,fp_send_90pct_or_more,fp_night_0_to_5h,fp_new_receiver,fp_median_amount,honest_median_amount_all
+as_simulated,2987,2591,396,0.133,40,0.227,0.101,0.114,0.328,121915,164967
+hardest,2987,1778,1209,0.405,121,0.087,0.098,0.039,0.312,144950,164967
