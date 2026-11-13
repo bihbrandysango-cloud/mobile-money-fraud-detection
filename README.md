@@ -2,6 +2,8 @@
 
 [![tests](https://github.com/bihbrandysango-cloud/mobile-money-fraud-detection/actions/workflows/tests.yml/badge.svg)](https://github.com/bihbrandysango-cloud/mobile-money-fraud-detection/actions/workflows/tests.yml)
 
+**Project Walkthrough:** [the whole project in 11 slides (PDF)](docs/Mobile-Money-Fraud-Alarm-Project-Walkthrough.pdf): problem, data, method, decisions, findings and limits
+
 **Live demo:** https://pixel-perfect-page-615.lovable.app (it runs in your browser; the alarm file is hosted on the Hugging Face Space [BrandyBih/mobile-money-fraud-alarm](https://huggingface.co/spaces/BrandyBih/mobile-money-fraud-alarm))
 
 In 2024 Cameroon handled 65% of all mobile money transactions in the CEMAC zone (BEAC). When a thief gets into a wallet, through a fake MTN or Orange call, a "wrong transfer" SMS or a SIM swap, the money usually leaves the same way: a transfer to a middleman account (a mule), then a cash-out at an agent. An operator has to catch that while it happens, without calling thousands of honest customers.
